@@ -1,0 +1,46 @@
+version: '3.7'
+
+services:
+  chat:
+    depends_on:
+      - redis
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: chat-docker
+    container_name: chat
+    restart: always
+    tty: true
+    ports:
+      - "${SERVER_PORT}:${SERVER_PORT}"
+    working_dir: /var/www/chat
+    env_file:
+      -  .env
+    # environment:
+    #   SERVICE_NAME: nestchat
+    #   SERVICE_TAGS: dev
+    #   REDIS_PORT: ${REDIS_PORT}
+    #   REDIS_HOST: ${REDIS_HOST}
+    volumes:
+      - ./:/var/www/chat
+      - /var/www/chat/node_modeuls
+    networks: 
+      - chat-networks
+  
+  redis:
+    image: redis
+    container_name: redis
+    command: ["redis-server","--bind","redis","--port","6379"]
+    volumes:
+      - red_data:/var/lib/redis
+    ports: 
+      - "${REDIS_PORT}:${REDIS_PORT}"
+    networks:
+      - chat-networks
+
+networks:
+  chat-networks:
+    driver: bridge
+
+volumes:
+ red_data: {}
